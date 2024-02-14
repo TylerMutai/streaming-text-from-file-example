@@ -25,25 +25,12 @@ async function readFile(filePath: string, start: number, end: number) {
   });
 }
 
-function getFileReaderConfig(dateFromRequest = new Date()) {
-  let date = new Date();
-  try {
-    const dateVal = new Date(dateFromRequest);
-    if (dateVal.getFullYear() >= 2024) {
-      date = new Date(dateFromRequest);
-    }
-  } catch (e) {
-    // ignore date formatting
-  }
-  // since toISOString converts date to UTC zero, we'll add 3 hours as we know we're on UTC+3 timezone.
-  // feel free to edit this to match your own timezone.
-  date.setHours(date.getHours() + 3);
-  const filePath = path.join(
-    process.cwd(),
-    `logs/${process.env.X_SOURCE_SYSTEM}-${date.toISOString().split("T")[0]}.log`,
-  );
+function getFileReaderConfig() {
+  // File being read. the file contains at least 6 thousand lines of logs.
+  // They'll all be efficiently streamed to the frontend without overusing your server's memory.
+  const filePath = path.join(process.cwd(), `logs/2024-02-13.log`);
   const fileStats = fs.statSync(filePath);
-  const byteLengthToRead = 1600; // represents 1.6KB. There's no reason for this, I just chose the number at random.
+  const byteLengthToRead = 125; // represents 125 bytes. There's no reason for this, I just chose the number since it showcases streaming better.
 
   const start = 0;
   let end = start + byteLengthToRead;
@@ -68,9 +55,11 @@ async function* makeIterator(
   }
   // This is just added here to better showcase streaming on the browser. You'll be able to see data being populated.
   // Feel free to remove this line to use streaming at its best.
-  await sleep(1000);
+  await sleep(200);
 
-  yield await readFile(filePath, start, end);
+  // The reason there's a start + 1 here is because we end up re-reading an extra byte everytime, duplicating
+  // the last character read twice.
+  yield await readFile(filePath, start + 1, end);
 
   // move [byteLengthToRead] bytes behind.
   const _start = end;
@@ -98,15 +87,10 @@ function iteratorToStream(iterator: any) {
   });
 }
 
-export async function GET(req: NextRequest, res: NextResponse) {
+export async function GET() {
   try {
-    const { searchParams } = req.nextUrl;
     const { filePath, start, end, byteLengthToRead, fileSize } =
-      getFileReaderConfig(
-        searchParams.get("date")
-          ? new Date(searchParams.get("date") as any)
-          : undefined,
-      );
+      getFileReaderConfig();
 
     const iterator = makeIterator(
       filePath,
@@ -125,12 +109,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
   } catch (e) {
     return NextResponse.json(
       {
-        header: {
-          responseMessage: (e as any)?.message,
-          responseCode: 500,
-          customerMessage:
-            (e as any)?.message || "A server error occurred. Contact support.",
-        },
+        message: `A server error occurred. Contact support. ${(e as any)?.message}`,
+        code: 500,
       },
       {
         status: 500,

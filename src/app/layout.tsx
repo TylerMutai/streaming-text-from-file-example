@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Playfair } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Playfair({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "A Streaming Example",
