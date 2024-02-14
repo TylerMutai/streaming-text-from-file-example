@@ -28,9 +28,10 @@ async function readFile(filePath: string, start: number, end: number) {
 function getFileReaderConfig() {
   // File being read. the file contains at least 6 thousand lines of logs.
   // They'll all be efficiently streamed to the frontend without overusing your server's memory.
+  // Open multiple tabs using the same URL and see for yourself.
   const filePath = path.join(process.cwd(), `logs/2024-02-13.log`);
   const fileStats = fs.statSync(filePath);
-  const byteLengthToRead = 125; // represents 125 bytes. There's no reason for this, I just chose the number since it showcases streaming better.
+  const byteLengthToRead = 16000; // represents 16KB. There's no reason for this, I just chose the number since it showcases streaming better.
 
   const start = 0;
   let end = start + byteLengthToRead;
@@ -55,7 +56,7 @@ async function* makeIterator(
   }
   // This is just added here to better showcase streaming on the browser. You'll be able to see data being populated.
   // Feel free to remove this line to use streaming at its best.
-  await sleep(200);
+  await sleep(10);
 
   // The reason there's a start + 1 here is because we end up re-reading an extra byte everytime, duplicating
   // the last character read twice.
