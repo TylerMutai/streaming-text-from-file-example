@@ -12,4 +12,10 @@ export default function Home() {
       tabs--;
     }
   }, []);
+
+  return (
+    <h2 className="p-10 m-10 w-full flex flex-row- items-center justify-center">
+      Nothing&apos;s happening? Make sure to enable popups in your browser!
+    </h2>
+  );
 }
