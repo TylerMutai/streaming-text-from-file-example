@@ -1,3 +1,5 @@
+# LOGS GENERATED USING OPEN AI's GPT-3.5-turbo
+
 1. 2021-05-01 14:23:05 [INFO] Application started.
 2. 2021-05-01 14:23:10 [DEBUG] Initializing database connection.
 3. 2021-05-01 14:23:11 [INFO] Database connection successful.
