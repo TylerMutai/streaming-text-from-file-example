@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -31,7 +31,8 @@ function getFileReaderConfig() {
   // Open multiple tabs using the same URL and see for yourself.
   const filePath = path.join(process.cwd(), `logs/2024-02-13.log`);
   const fileStats = fs.statSync(filePath);
-  const byteLengthToRead = 16000; // represents 16KB. There's no reason for this, I just chose the number since it showcases streaming better.
+  const byteLengthToRead = 16000; // represents 16KB. There's no reason for this, I just chose the number since it
+  // showcases streaming better.
 
   const start = 0;
   let end = start + byteLengthToRead;
